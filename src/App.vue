@@ -1,18 +1,21 @@
 <template>
   <div id="app">
-    <wrapper></wrapper>
+    <!--    <base-wrapper></base-wrapper>-->
+    <pag-wrapper></pag-wrapper>
   </div>
 </template>
 
 <script>
-import Wrapper from '@/components/'
+// import BaseWrapper from "@/components/base";
+import PagWrapper from "@/components/with-pag";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    Wrapper
-  }
-}
+    // BaseWrapper,
+    PagWrapper,
+  },
+};
 </script>
 
 <style>

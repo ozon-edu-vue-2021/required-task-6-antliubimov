@@ -14,7 +14,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="item in sortedRows" :key="item.id">
+      <tr v-for="item in displayedRows" :key="item.id">
         <td
           v-for="column in Object.keys(tableColumns)"
           :key="item[column] + Math.random()"
@@ -39,6 +39,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    displayedRows: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -48,7 +52,6 @@ export default {
         name: "Name",
         email: "Email",
       },
-      sortOrders: this.rows,
       sortKeys: [],
       sortProps: [],
       sortDirections: {
@@ -66,49 +69,65 @@ export default {
       },
     };
   },
-  computed: {
+  computed: {},
+  methods: {
     sortedRows() {
       let res;
 
-      if (!this.sortProps.length) {
-        res = this.rows;
-      }
-
-      let directions = [];
-      this.sortProps.forEach((props) => {
-        if (this.sortDirections[props]) {
-          directions.push(this.sortDirections[props]);
+      if (!this.sortProps.length && !this.filterProps.length) {
+        this.pag(this.rows);
+      } else {
+        if (this.sortProps.length) {
+          let directions = [];
+          this.sortProps.forEach((props) => {
+            if (this.sortDirections[props]) {
+              directions.push(this.sortDirections[props]);
+            }
+          });
+          res = orderBy(this.rows, this.sortProps, directions);
         }
-      });
 
-      res = orderBy(this.rows, this.sortProps, directions);
-
-      if (this.filterProps.length) {
-        this.filterProps.forEach((prop) => {
-          {
-            res = res.filter(
-              (row) =>
-                String(row[prop]).search(this.filterText[prop].toLowerCase()) >
-                -1
-            );
+        if (this.filterProps.length) {
+          if (res) {
+            res = this.filterRows(res);
+          } else {
+            res = this.filterRows(this.rows);
           }
-        });
+        }
+        this.pag(res);
       }
-
-      return res;
     },
-  },
-  methods: {
     toggleSort(column) {
+      this.firstPage();
       this.sortDirections[column] =
         this.sortDirections[column] === "desc" ? "asc" : "desc";
       if (!this.sortProps.includes(column)) {
         this.sortProps.push(column);
       }
+      this.sortedRows();
     },
     filterInputText(e, column) {
+      this.firstPage();
       this.filterProps.push(column);
       this.filterText[column] = e.target.value;
+      this.sortedRows();
+    },
+    filterRows(rows) {
+      this.filterProps.forEach((prop) => {
+        {
+          rows = rows.filter(
+            (row) =>
+              String(row[prop]).search(this.filterText[prop].toLowerCase()) > -1
+          );
+        }
+      });
+      return rows;
+    },
+    firstPage() {
+      this.$emit("firstPage");
+    },
+    pag(rows) {
+      this.$emit("my-new-rows", rows);
     },
   },
 };
@@ -139,7 +158,6 @@ td {
 
 .arrow {
   display: inline-block;
-  /*display: none;*/
   position: relative;
   vertical-align: middle;
   width: 0;
@@ -157,15 +175,9 @@ td {
 
 .arrow.asc:after {
   content: "↓";
-  /*border-left: 4px solid transparent;*/
-  /*border-right: 4px solid transparent;*/
-  /*border-bottom: 4px solid #fff;*/
 }
 
 .arrow.desc:after {
   content: "↑";
-  /*border-left: 4px solid transparent;*/
-  /*border-right: 4px solid transparent;*/
-  /*border-top: 4px solid #fff;*/
 }
 </style>
