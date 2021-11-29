@@ -1,19 +1,22 @@
 <template>
   <div id="app">
-<!--        <base-wrapper></base-wrapper>-->
-    <pag-wrapper></pag-wrapper>
+    <!--        <base-wrapper></base-wrapper>-->
+    <!--    <pag-wrapper></pag-wrapper>-->
+    <virt-scroll-wrapper></virt-scroll-wrapper>
   </div>
 </template>
 
 <script>
 // import BaseWrapper from "@/components/base";
-import PagWrapper from "@/components/with-pag";
+// import PagWrapper from "@/components/with-pag";
+import VirtScrollWrapper from "@/components/virt-scroll";
 
 export default {
   name: "App",
   components: {
     // BaseWrapper,
-    PagWrapper,
+    // PagWrapper,
+    VirtScrollWrapper,
   },
 };
 </script>
@@ -25,6 +28,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 0px;
 }
 </style>
