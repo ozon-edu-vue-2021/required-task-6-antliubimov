@@ -43,7 +43,7 @@ export default {
   },
   computed: {
     displayedRows() {
-      this.setPages();
+      this.setPages(this.currRows);
       return this.paginate(this.currRows);
     },
   },
@@ -57,8 +57,9 @@ export default {
         console.log(e);
       }
     },
-    setPages() {
-      let numberOfPages = Math.ceil(this.rows.length / this.perPage);
+    setPages(rows) {
+      this.pages = [];
+      let numberOfPages = Math.ceil(rows.length / this.perPage);
       for (let index = 1; index <= numberOfPages; index++) {
         this.pages.push(index);
       }
