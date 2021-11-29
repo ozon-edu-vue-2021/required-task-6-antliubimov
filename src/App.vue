@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <!--    <base-wrapper></base-wrapper>-->
+<!--        <base-wrapper></base-wrapper>-->
     <pag-wrapper></pag-wrapper>
   </div>
 </template>
