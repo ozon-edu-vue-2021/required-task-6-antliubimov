@@ -18,7 +18,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="item in computedRows" :key="item.id + new Date().getTime()">
+      <tr v-for="item in displayedRows" :key="item.id + new Date().getTime()">
         <td
           v-for="column in Object.keys(tableColumns)"
           :key="column + new Date().getTime()"
@@ -43,7 +43,10 @@ export default {
       type: Array,
       default: () => [],
     },
-
+    displayedRows: {
+      type: Array,
+      default: () => [],
+    },
     offsetY: {
       type: Number,
       default: 0,
@@ -85,11 +88,13 @@ export default {
       }
       return res;
     },
+  },
+  methods: {
     computedRows() {
       let res;
 
       if (!this.sortProps.length && !this.filterProps.length) {
-        return this.rows;
+        this.setNewRows(this.rows);
       } else {
         if (this.sortProps.length) {
           res = this.sortedRows();
@@ -99,17 +104,16 @@ export default {
           res = res ? this.filterRows(res) : this.filterRows(this.rows);
         }
 
-        return res;
+        this.setNewRows(res);
       }
     },
-  },
-  methods: {
     toggleSort(column) {
       this.sortDirections[column] =
         this.sortDirections[column] === "desc" ? "asc" : "desc";
       if (!this.sortProps.includes(column)) {
         this.sortProps.push(column);
       }
+      this.computedRows();
     },
     filterInputText(e, column) {
       if (!this.filterProps.includes(column)) {
@@ -119,6 +123,7 @@ export default {
       if (this.filterText[column] === "") {
         this.filterProps.splice(this.filterProps.indexOf(column), 1);
       }
+      this.computedRows();
     },
     filterRows(rows) {
       this.filterProps.forEach((prop) => {
@@ -140,6 +145,9 @@ export default {
       });
       return orderBy(this.rows, this.sortProps, directions);
     },
+    setNewRows(rows) {
+      this.$emit("my-new-rows", rows);
+    },
   },
 };
 </script>
@@ -152,7 +160,6 @@ export default {
   border-radius: 3px;
   background-color: #fff;
   text-align: left;
-  /*overflow: scroll;*/
 }
 tr {
   height: 59px;
