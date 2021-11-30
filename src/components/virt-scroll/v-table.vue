@@ -2,7 +2,11 @@
   <table class="table">
     <thead>
       <tr>
-        <th v-for="column in Object.entries(tableColumns)" :key="column[0]">
+        <th
+          v-for="column in Object.entries(tableColumns)"
+          :key="column[0]"
+          :style="{ transform: 'translateY(' + -getOffsetY + 'px)' }"
+        >
           <div @click="toggleSort(column[0])">
             {{ column[1] }}
             <span class="arrow" :class="sortDirections[column[0]]"></span>
@@ -14,10 +18,10 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="item in computedRows" :key="item.id + Math.random()">
+      <tr v-for="item in computedRows" :key="item.id + new Date().getTime()">
         <td
           v-for="column in Object.keys(tableColumns)"
-          :key="start + item[column] + item.id + Math.random()"
+          :key="column + new Date().getTime()"
         >
           <a v-if="column === 'email'" :href="`mailto:${item[column]}`">{{
             item[column]
@@ -39,7 +43,8 @@ export default {
       type: Array,
       default: () => [],
     },
-    start: {
+
+    offsetY: {
       type: Number,
       default: 0,
     },
@@ -71,6 +76,15 @@ export default {
     };
   },
   computed: {
+    getOffsetY() {
+      let res;
+      if (this.offsetY < 649) {
+        res = this.offsetY;
+      } else {
+        res = 649;
+      }
+      return res;
+    },
     computedRows() {
       let res;
 
@@ -132,10 +146,24 @@ export default {
 
 <style scoped>
 .table {
-  width: 1000px;
+  width: 100%;
+  border-collapse: collapse;
   border: 3px solid #259463;
   border-radius: 3px;
   background-color: #fff;
+  text-align: left;
+  /*overflow: scroll;*/
+}
+tr {
+  height: 59px;
+}
+
+thead tr:first-child th {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  opacity: 1;
+  z-index: 1;
 }
 
 th {
@@ -153,8 +181,11 @@ th,
 td {
   box-sizing: border-box;
   min-width: 75px;
-  height: 59px;
   padding: 10px 20px;
+  border: 1px solid lightgray;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .arrow {

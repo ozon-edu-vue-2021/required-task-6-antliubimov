@@ -1,12 +1,16 @@
 <template>
   <div
     class="container"
-    :style="{ height: blockHeight + 'px' }"
+    :style="{ height: viewportHeight + 'px', overflow: 'auto' }"
     @scroll="scrollRows($event)"
   >
-    <div :style="{ height: topHeight + 'px' }"></div>
-    <v-table :rows="displayedRows" :start="start"></v-table>
-    <div :style="{ height: bottomHeight + 'px' }"></div>
+    <div
+      :style="{ height: totalContentHeight + 'px', overflow: 'hidden' }"
+    ></div>
+
+    <div :style="{ transform: 'translateY(' + offsetY + 'px)' }">
+      <v-table :rows="displayedRows" :offsetY="offsetY"></v-table>
+    </div>
   </div>
 </template>
 
@@ -28,27 +32,20 @@ export default {
     };
   },
   created() {
-    window.addEventListener("scroll", this.scrollRows);
     this.getRows();
-  },
-  destroyed() {
-    window.removeEventListener("scroll", this.scrollRows);
   },
   computed: {
     displayedRows() {
       return this.rows.slice(this.start, this.start + this.visibleRows + 1);
     },
-    topHeight() {
-      return this.rowHeight * this.start;
+    viewportHeight() {
+      return this.rowHeight * this.visibleRows;
     },
-    bottomHeight() {
-      return (
-        this.rowHeight *
-        (this.rows.length - (this.start + this.visibleRows + 1))
-      );
+    totalContentHeight() {
+      return this.rowHeight * this.rows;
     },
-    blockHeight() {
-      return this.rowHeight * (this.visibleRows + 1);
+    offsetY() {
+      return this.start * this.rowHeight;
     },
   },
   methods: {
@@ -61,10 +58,7 @@ export default {
       }
     },
     scrollRows(e) {
-      this.start = Math.min(
-        this.rows.length - this.visibleRows - 1,
-        Math.floor(e.target.scrollTop / this.rowHeight)
-      );
+      this.start = Math.floor(e.target.scrollTop / this.rowHeight);
     },
   },
 };
